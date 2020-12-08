@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Net;
-using System.Linq;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace TCP_Server_Asynchronous
 {
@@ -75,13 +73,15 @@ namespace TCP_Server_Asynchronous
                 try
                 {
                     stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
+                    
                     stream.Read(buffer, 0, Buffer_size);
+                    string message = System.Text.Encoding.ASCII.GetString(buffer);
 
-                    Console.WriteLine("Message from client : " + System.Text.Encoding.ASCII.GetString(buffer));
+                    Console.WriteLine("Message from client : " + message);
 
-                    stream.Write(buffer, 0, Buffer_size);
+                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequestAsync("standings", null).Result);
+                    stream.Write(serverResponseBuffer, 0, Buffer_size);
 
-                    ApiConnector.GetRequest("test", null);
                 }
                 catch (Exception)
                 {
