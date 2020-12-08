@@ -2,6 +2,7 @@
 using System.Net;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace TCP_Server_Asynchronous
 {
@@ -10,7 +11,7 @@ namespace TCP_Server_Asynchronous
 
         #region Fields
 
-        private int counter = 0;
+        
 
         #endregion
 
@@ -57,26 +58,6 @@ namespace TCP_Server_Asynchronous
             TcpClient.Close();
         }
 
-        /// <summary>
-        /// Calculates ammount of each letter in a message
-        /// </summary>
-        /// <param name="message">Message sent by client</param>
-        /// <returns>Count of each letter in meesage</returns>
-        private static string CalculateLetterCount(string message)
-        {
-            message = message.Substring(0, message.IndexOf('\0'));
-
-            var query = message.GroupBy(c => c).Select(c => new { Char = c.Key, Count = c.Count() });
-
-            string response = "";
-
-            foreach (var result in query)
-            {
-                if (result.Count > 0 && result.Count < 100 && result.Char != ' ') response += ("Char " + result.Char + " appears " + result.Count + " times\n");
-            }
-
-            return response;
-        }
 
         /// <summary>
         /// Takes incoming messages and returns answer
@@ -87,29 +68,20 @@ namespace TCP_Server_Asynchronous
             byte[] buffer = new byte[Buffer_size];
             byte[] serverResponseBuffer = new byte[Buffer_size];
 
-            string firstMessage = "Enter string to count letters : ";
-
-            stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
+            string firstMessage = "Enter command : ";
 
             while (true)
             {
                 try
                 {
+                    stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
                     stream.Read(buffer, 0, Buffer_size);
 
-                    string message = System.Text.Encoding.ASCII.GetString(buffer);
-                    ReceivedMessages[counter] = message;
+                    Console.WriteLine("Message from client : " + System.Text.Encoding.ASCII.GetString(buffer));
 
-                    string response = CalculateLetterCount(message);
-                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(response);
-                    SentMessages[counter] = serverResponseBuffer.ToString();
+                    stream.Write(buffer, 0, Buffer_size);
 
-                    counter++;
-
-                    stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
-
-                    Array.Clear(buffer, 0, buffer.Length);
-                    Array.Clear(serverResponseBuffer, 0, serverResponseBuffer.Length);
+                    ApiConnector.GetRequest("test", null);
                 }
                 catch (Exception)
                 {
