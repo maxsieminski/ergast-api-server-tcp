@@ -78,8 +78,6 @@ namespace TCP_Server_Asynchronous
 
                     Console.WriteLine(ApiConnector.GetRequest("standings", null));
 
-                    Console.WriteLine("TEST");
-
                     serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest("standings", null));
 
                     stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
