@@ -30,9 +30,6 @@ namespace TCP_Server_Asynchronous
             AcceptClient();
         }
 
-        public string[] ReceivedMessages { get; } = new string[100];
-        public string[] SentMessages { get; } = new string[100];
-
         /// <summary>
         /// Listens for incoming clients
         /// </summary>
@@ -79,8 +76,11 @@ namespace TCP_Server_Asynchronous
 
                     Console.WriteLine("Message from client : " + message);
 
-                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequestAsync("standings", null).Result);
-                    stream.Write(serverResponseBuffer, 0, Buffer_size);
+                    Console.WriteLine(ApiConnector.GetRequest("standings", null));
+
+                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest("standings", null));
+
+                    stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
 
                 }
                 catch (Exception)

@@ -9,7 +9,7 @@ namespace TCP_Server_Asynchronous
 {
     abstract class ApiConnector
     {
-        private static ErgastClient client;
+        private static readonly ErgastClient client = new ErgastClient();
 
         private static void GetConstructorStandings(string v1, string v2)
         {
@@ -52,18 +52,16 @@ namespace TCP_Server_Asynchronous
 
             foreach (var element in standingsResponse)
             {
-                response += element.Position + " " + element.Driver.FullName + " " + element.Constructor.Name + " " + element.Points + " " + element.Wins + "\n";
+                response += String.Format("{0}  {1}  {2}  {3}  {4}\n", element.Position, element.Driver.FullName, element.Constructor.Name, element.Points, element.Wins);
             }
 
             return response;
         }
 
-        public static async Task<string> GetRequestAsync(string category, string[]? args)
+        public static string GetRequest(string category, string[]? args)
         {
-            client = new ErgastClient();
-
             // TODO switch cases for categories
-            switch(category)
+            switch (category)
             {
                 case "standings":
                     if (args == null) return GetDriverStandings("", "").Result;

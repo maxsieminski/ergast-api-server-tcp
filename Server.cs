@@ -12,7 +12,7 @@ namespace TCP_Server_Asynchronous
         #region Fields
         IPAddress iPAddress;
         int port;
-        int buffer_size = 10240;
+        int buffer_size = 4096;
         bool running;
         TcpListener tcpListener;
         TcpClient tcpClient;
