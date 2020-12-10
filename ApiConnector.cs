@@ -115,7 +115,6 @@ namespace TCP_Server_Asynchronous
 
         public static string GetRequest(string category, string[]? args)
         {
-            // TODO switch cases for categories
             switch (category)
             {
                 case "standings":
@@ -131,11 +130,11 @@ namespace TCP_Server_Asynchronous
                     if (args == null) return GetSchedule("").Result;
                     else return GetSchedule(args[0]).Result;
                 case "current":
-                    GetCurrent();
-                    break;
+                    if (args == null) return "No argument specified";
+                    else return GetCurrent(args[0]).Result;
                 case "stats":
-                    GetStats(args[0]);
-                    break;
+                    if (args == null) return "No argument specified";
+                    else return GetStats(args[0]).Result;
             }
 
             return "";
