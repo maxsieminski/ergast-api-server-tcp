@@ -43,7 +43,7 @@ namespace TCP_Server_Asynchronous
 
             string response = "";
 
-            foreach(var element in raceListResponse)
+            foreach (var element in raceListResponse)
             {
                 response += String.Format("{0} {1} {2} {3} {4}\n", element.Round, element.RaceName, element.Circuit.CircuitName, element.Circuit.Location, element.StartTime);
             }
@@ -51,14 +51,44 @@ namespace TCP_Server_Asynchronous
             return response;
         }
 
-        private static void GetCurrent()
+        private static async Task<string> GetCurrent(string? v)
         {
-            throw new NotImplementedException();
+            var request = new FinishingStatusRequest
+            {
+                ConstructorId = String.IsNullOrEmpty(v) ? "hamilton" : v
+            };
+
+            FinishingStatusResponse serverResponse = await client.GetResponseAsync(request);
+
+            var standingsResponse = serverResponse.Statuses;
+            string response = "";
+
+            foreach (var element in standingsResponse)
+            {
+                response += String.Format("{0}  {1}  {2}\n", element.Status, element.StatusText, element.Count);
+            }
+
+            return response;
         }
 
-        private static void GetStats(string? v)
+        private static async Task<string> GetStats(string? v)
         {
-            throw new NotImplementedException();
+            var request = new ConstructorInfoRequest
+            {
+                ConstructorId = String.IsNullOrEmpty(v) ? "ferrari" : v
+            };
+
+            ConstructorResponse serverResponse = await client.GetResponseAsync(request);
+
+            var standingsResponse = serverResponse.Constructors;
+            string response = "";
+
+            foreach (var element in standingsResponse)
+            {
+                response += String.Format("{0}  {1}  {2}  {3}\n", element.ConstructorId, element.Name, element.Nationality, element.WikiUrl);
+            }
+
+            return response;
         }
 
         public static async Task<string> GetDriverStandings(string? year, string? round)
