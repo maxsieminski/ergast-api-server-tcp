@@ -11,19 +11,44 @@ namespace TCP_Server_Asynchronous
     {
         private static readonly ErgastClient client = new ErgastClient();
 
-        private static void GetConstructorStandings(string v1, string v2)
+        private static void GetConstructorStandings(string? v1, string? v2)
         {
             throw new NotImplementedException();
         }
 
-        private static void GetAllWinners()
+        private static async Task<string> GetDriverInfo(string id)
         {
-            throw new NotImplementedException();
+            var request = new DriverInfoRequest
+            {
+                DriverId = id,
+            };
+
+            DriverResponse serverResponse = await client.GetResponseAsync(request);
+
+            var driverResponse = serverResponse.Drivers[0];
+
+            return String.Format("{0} {1} {2} {3}\n", driverResponse.FullName, driverResponse.PermanentNumber, driverResponse.Nationality, driverResponse.DateOfBirth);
         }
 
-        private static void GetSchedule(string v)
+        private static async Task<string> GetSchedule(string season)
         {
-            throw new NotImplementedException();
+            var request = new RaceListRequest
+            {
+                Season = String.IsNullOrEmpty(season) ? Seasons.Current : season,
+            };
+
+            RaceListResponse serverResponse = await client.GetResponseAsync(request);
+
+            var raceListResponse = serverResponse.Races;
+
+            string response = "";
+
+            foreach(var element in raceListResponse)
+            {
+                response += String.Format("{0} {1} {2} {3} {4}\n", element.Round, element.RaceName, element.Circuit.CircuitName, element.Circuit.Location, element.StartTime);
+            }
+
+            return response;
         }
 
         private static void GetCurrent()
@@ -31,7 +56,7 @@ namespace TCP_Server_Asynchronous
             throw new NotImplementedException();
         }
 
-        private static void GetStats(string v)
+        private static void GetStats(string? v)
         {
             throw new NotImplementedException();
         }
@@ -69,12 +94,12 @@ namespace TCP_Server_Asynchronous
                 case "constandings":
                     GetConstructorStandings(args[0], args[1]);
                     break;
-                case "allwinners":
-                    GetAllWinners();
-                    break;
+                case "driver":
+                    if (args == null) return "No driver specified!";
+                    else return GetDriverInfo(args[0]).Result;
                 case "schedule":
-                    GetSchedule(args[0]);
-                    break;
+                    if (args == null) return GetSchedule("").Result;
+                    else return GetSchedule(args[0]).Result;
                 case "current":
                     GetCurrent();
                     break;
