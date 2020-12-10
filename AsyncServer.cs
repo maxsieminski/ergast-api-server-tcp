@@ -88,14 +88,14 @@ namespace TCP_Server_Asynchronous
                             else
                             {
 
-                                string[] test = message.Skip(1).Take(message.Length).ToArray();
+                                string[] arg = message.Skip(1).Take(message.Length).ToArray();
 
-                                for (int i = 0; i < test.Length; i++)
+                                for (int i = 0; i < arg.Length; i++)
                                 {
-                                    test[i] = test[i].Replace("\0", string.Empty);
+                                    arg[i] = arg[i].Replace("\0", string.Empty);
                                 }
 
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], test));
+                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
                             }
 
                             stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
@@ -103,40 +103,7 @@ namespace TCP_Server_Asynchronous
                         }
                    
 
-                    /*
-                    stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
-
-                    stream.Read(buffer, 0, Buffer_size);
-                    string message = System.Text.Encoding.ASCII.GetString(buffer);
-
-                    char[] delimiterChars = { ' ', ',', '.', ':', '\t' };
-                    string[] words = message.Split(delimiterChars); //Split(' ')
-                    ArraySegment<String> myArrSegAll = new ArraySegment<String>(words);
-                  //  string komenda1 = myArrSegAll.Array[0];
-                    string root= "help";
-                    string root2 = myArrSegAll.Array[0];
-                    //string komenda2 = myArrSegAll.Array[1];
-                    bool comparison = String.Equals(root, root2);
-                    if (comparison == true)
-                    {
-                        Console.WriteLine("[komenda], [rok], [liczba]"); //nie dziala :((((
-                    }
-
-                    //string[] reszta = { myArrSegAll.Array[1], myArrSegAll.Array[2] };
-
-
-
-
-                    Console.WriteLine("Message from client : " + message);
-
-                    //Console.WriteLine(ApiConnector.GetRequest("standings", null));
-
-
-                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(myArrSegAll.Array[0], null));
-
-                    stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
-
-                }*/
+                  
                 catch (Exception)
                 {
                     break;
