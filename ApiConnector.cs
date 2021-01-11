@@ -115,29 +115,37 @@ namespace TCP_Server_Asynchronous
 
         public static string GetRequest(string category, string[]? args)
         {
+
+            string response = "";
+
             switch (category)
             {
                 case "standings":
-                    if (args == null) return GetDriverStandings("", "").Result;
-                    else return GetDriverStandings(args[0], args[1]).Result;
+                    if (args == null) response = GetDriverStandings("", "").Result;
+                    else response = GetDriverStandings(args[0], args[1]).Result;
+                    break;
                 case "constandings":
-                    GetConstructorStandings(args[0], args[1]);
+                    response = "";//GetConstructorStandings(args[0], args[1]);
                     break;
                 case "driver":
-                    if (args == null) return "No driver specified!";
-                    else return GetDriverInfo(args[0]).Result;
+                    if (args == null) response = "No driver specified!";
+                    else response = GetDriverInfo(args[0]).Result;
+                    break;
                 case "schedule":
-                    if (args == null) return GetSchedule("").Result;
-                    else return GetSchedule(args[0]).Result;
+                    if (args == null) response = GetSchedule("").Result;
+                    else response = GetSchedule(args[0]).Result;
+                    break;
                 case "current":
-                    if (args == null) return "No argument specified";
-                    else return GetCurrent(args[0]).Result;
+                    if (args == null) response = "No argument specified";
+                    else response = GetCurrent(args[0]).Result;
+                    break;
                 case "stats":
-                    if (args == null) return "No argument specified";
-                    else return GetStats(args[0]).Result;
+                    if (args == null) response = "No argument specified";
+                    else response = GetStats(args[0]).Result;
+                    break;
             }
 
-            return "";
+            return response;
         }
     }
 }

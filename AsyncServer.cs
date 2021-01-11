@@ -10,8 +10,6 @@ namespace TCP_Server_Asynchronous
 
         #region Fields
 
-        
-
         #endregion
 
         #region Constructors
@@ -71,39 +69,37 @@ namespace TCP_Server_Asynchronous
                 try
                 {
                    
-                      stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
+                    stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
 
-                            stream.Read(buffer, 0, Buffer_size);
-                            string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(' ');
-                            
-                            if (message[0] == "Help")
-                            {
+                    stream.Read(buffer, 0, Buffer_size);
+                    char[] separators = new char[]{' ', '\0'};
+                    string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);      
+
+                    message = message.Select(s => s.ToLowerInvariant()).ToArray();
+
+                    if (message[0] == "Help")
+                    {
                         Console.WriteLine("[Komenda] [Rok] [Runda]");
-                            }
+                    }
 
-                            if (message.Length == 1)
-                            {
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], null));
-                            }
-                            else
-                            {
+                    if (message.Length == 1)
+                    {
+                        serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], null));
+                    }
+                    else
+                    {
+                        string[] arg = message.Skip(1).Take(message.Length).ToArray();
 
-                                string[] arg = message.Skip(1).Take(message.Length).ToArray();
-
-                                for (int i = 0; i < arg.Length; i++)
-                                {
-                                    arg[i] = arg[i].Replace("\0", string.Empty);
-                                }
-
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
-                            }
-
-                            stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
-
+                        for (int i = 0; i < arg.Length; i++)
+                        {
+                            arg[i] = arg[i].Replace("\0", string.Empty);
                         }
-                   
 
-                  
+                        serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
+                   }
+                   stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
+                }
+
                 catch (Exception)
                 {
                     break;
