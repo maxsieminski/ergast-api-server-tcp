@@ -68,7 +68,6 @@ namespace TCP_Server_Asynchronous
             {
                 try
                 {
-                   
                     stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
 
                     stream.Read(buffer, 0, Buffer_size);
@@ -77,27 +76,32 @@ namespace TCP_Server_Asynchronous
 
                     message = message.Select(s => s.ToLowerInvariant()).ToArray();
 
-                    if (message[0] == "Help")
-                    {
-                        Console.WriteLine("[Komenda] [Rok] [Runda]");
-                    }
-
-                    if (message.Length == 1)
-                    {
-                        serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], null));
-                    }
-                    else
-                    {
-                        string[] arg = message.Skip(1).Take(message.Length).ToArray();
-
-                        for (int i = 0; i < arg.Length; i++)
-                        {
-                            arg[i] = arg[i].Replace("\0", string.Empty);
+                    foreach(string s in message) {
+                        if (s.Contains((char)13)) {
+                            message = null;
+                            break;
                         }
+                    }
 
-                        serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
-                   }
-                   stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
+                    if (message != null)
+                    {
+                        if (message.Length == 1)
+                        {
+                            serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], null));
+                        }
+                        else if (message.Length > 0)
+                        {
+                            string[] arg = message.Skip(1).Take(message.Length).ToArray();
+
+                            for (int i = 0; i < arg.Length; i++)
+                            {
+                                arg[i] = arg[i].Replace("\0", string.Empty);
+                            }
+
+                            serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
+                        }
+                        stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
+                    }
                 }
 
                 catch (Exception)

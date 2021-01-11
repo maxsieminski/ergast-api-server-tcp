@@ -143,9 +143,12 @@ namespace TCP_Server_Asynchronous
                     if (args == null) response = "No argument specified";
                     else response = GetStats(args[0]).Result;
                     break;
+                case "help":
+                    response = "Komenda Rok Runda";
+                    break;
             }
 
-            return response;
+            return response + "\n";
         }
     }
 }
