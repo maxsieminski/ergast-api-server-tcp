@@ -59,54 +59,73 @@ namespace TCP_Server_Asynchronous
         /// <param name="stream">Client stream</param>
         protected override void BeginDataTransmission(NetworkStream stream)
         {
+            bool authenticated = false;
+            char[] separators = new char[]{' ', '\0'};
             byte[] buffer = new byte[Buffer_size];
             byte[] serverResponseBuffer = new byte[Buffer_size];
 
             string firstMessage = "Enter command : ";
 
-            while (true)
+            while(true)
             {
                 try
                 {
-                    stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
+                    if (!authenticated) {
+                        string loginFirstMsg = "Enter login [login] [password]\n or register [login] [password]: ";
 
-                    stream.Read(buffer, 0, Buffer_size);
-                    char[] separators = new char[]{' ', '\0'};
-                    string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);      
+                        stream.Write(System.Text.Encoding.ASCII.GetBytes(loginFirstMsg), 0, loginFirstMsg.Length);
+                        stream.Read(buffer, 0, Buffer_size);
+                        string[] login  = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None); 
 
-                    message = message.Select(s => s.ToLowerInvariant()).ToArray();
-
-                    foreach(string s in message) {
-                        if (s.Contains((char)13)) {
-                            message = null;
-                            break;
+                        if(login[0] == "login") {
+                            if (Authentication.AuthenticateUser(login[1], login[2]) == 'y') 
+                            {
+                                authenticated = true;
+                                Console.WriteLine("Logged in!");
+                            }
+                        }
+                        else if(login[0] == "register") {
+                            Authentication.CreateUser(login[1], login[2]);
                         }
                     }
-
-                    if (message != null)
+                    else 
                     {
-                        if (message.Length == 1)
-                        {
-                            serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], null));
-                        }
-                        else if (message.Length > 0)
-                        {
-                            string[] arg = message.Skip(1).Take(message.Length).ToArray();
+                        stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
+                        stream.Read(buffer, 0, Buffer_size);
+                        string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();      
 
-                            for (int i = 0; i < arg.Length; i++)
-                            {
-                                arg[i] = arg[i].Replace("\0", string.Empty);
+                        foreach(string s in message) {
+                            if (s.Contains((char)13)) {
+                                message = null;
+                                break;
                             }
-
-                            serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
                         }
-                        stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
+
+                        if(message != null) 
+                        {
+                            if (message.Length == 1)
+                            {
+                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], null));
+                            }
+                            else 
+                            {
+                                string[] arg = message.Skip(1).Take(message.Length).ToArray();
+
+                                for (int i = 0; i < arg.Length; i++)
+                                {
+                                    arg[i] = arg[i].Replace("\0", string.Empty);
+                                }
+
+                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
+                            }
+                            stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
+                        }
                     }
                 }
-
-                catch (Exception)
+                catch (Exception e)
                 {
-                    break;
+                    Console.WriteLine(e);
+                    System.Environment.Exit(1);
                 }
             }
         }
@@ -116,12 +135,3 @@ namespace TCP_Server_Asynchronous
         #endregion
     }
 }
-
-
-
-
-
-/*if (System.Text.Encoding.ASCII.GetString(buffer) == "Help")
-{
-    Console.WriteLine("[komenda], [ew. rok], [ew. numer]");
-}*/
