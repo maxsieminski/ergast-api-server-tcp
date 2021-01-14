@@ -162,36 +162,6 @@ namespace TCP_Server_Asynchronous
                 response = "Komenda Rok Runda";
             }
 
-            // switch (category)
-            // {
-            //     case "standings":
-            //         if (args == null) response = GetDriverStandings("", "").Result;
-            //         else response = GetDriverStandings(args[0], args[1]).Result;
-            //         break;
-            //     case "constandings":
-            //         response = "";//GetConstructorStandings(args[0], args[1]);
-            //         break;
-            //     case "driver":
-            //         if (args == null) response = "No driver specified!";
-            //         else response = GetDriverInfo(args[0]).Result;
-            //         break;
-            //     case "schedule":
-            //         if (args == null) response = GetSchedule("").Result;
-            //         else response = GetSchedule(args[0]).Result;
-            //         break;
-            //     case "current":
-            //         if (args == null) response = "No argument specified";
-            //         else response = GetCurrent(args[0]).Result;
-            //         break;
-            //     case "stats":
-            //         if (args == null) response = "No argument specified";
-            //         else response = GetStats(args[0]).Result;
-            //         break;
-            //     case "help":
-            //         response = "Komenda Rok Runda";
-            //         break;
-            // }
-
             return response + "\n";
         }
     }
