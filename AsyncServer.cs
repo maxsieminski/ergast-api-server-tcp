@@ -97,7 +97,6 @@ namespace TCP_Server_Asynchronous
                         foreach(string s in message) {
                             if (s.Contains((char)13)) {
                                 message = null;
-                                break;
                             }
                         }
 
