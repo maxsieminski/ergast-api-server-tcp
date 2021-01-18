@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 #nullable enable
 namespace TCP_Server_Asynchronous
 {
-    abstract class ApiConnector
+    abstract class ConnectionHandler
     {
         private static readonly ErgastClient client = new ErgastClient();
 
@@ -112,7 +112,7 @@ namespace TCP_Server_Asynchronous
             var request = new DriverStandingsRequest
             {
                 Season = String.IsNullOrEmpty(year) ? Seasons.Current : year,
-                Round = String.IsNullOrEmpty(round) ? Rounds.Last : round,
+                Round = String.IsNullOrEmpty(round) ? "8" : round,
             };
 
             try {
@@ -133,33 +133,73 @@ namespace TCP_Server_Asynchronous
             }
         }
 
-        public static string GetRequest(string category, string[]? args)
+        public static string GetRequest(string category, string[]? args, string? user)
         {
 
             string response = "";
 
             if (category.Contains("standings")) {
-                if (args == null) response = GetDriverStandings("", "").Result;
-                else response = GetDriverStandings(args[0], args[1]).Result;
+                if (args == null) {
+                    response = GetDriverStandings("", "").Result;
+                    HistoryHandling.addToHistory(user, "Standings");
+                } 
+                else {
+                    response = GetDriverStandings(args[0], args[1]).Result;
+                    HistoryHandling.addToHistory(user, "Standings" + " " + string.Join("", args));
+                }
             }
             else if (category.Contains("driver")) {
-                if (args == null) response = "No driver specified!";
-                else response = GetDriverInfo(args[0]).Result;
+                if (args == null) {
+                    response = "No driver specified!";
+                    HistoryHandling.addToHistory(user, "Driver");
+                } 
+                else {
+                    response = GetDriverInfo(args[0]).Result;
+                    HistoryHandling.addToHistory(user, "Driver" + " " + string.Join("", args));
+                }
             }
             else if (category.Contains("schedule")) {
-                if (args == null) response = GetSchedule("").Result;
-                else response = GetSchedule(args[0]).Result;
+                if (args == null) {
+                    response = GetSchedule("").Result;
+                    HistoryHandling.addToHistory(user, "Schedule");
+                }
+                else {
+                    response = GetSchedule(args[0]).Result;
+                    HistoryHandling.addToHistory(user, "Schedule" + " " + string.Join("", args));
+                }
             }
             else if (category.Contains("current")) {
-                if (args == null) response = "No argument specified";
-                else response = GetCurrent(args[0]).Result;
+                if (args == null) {
+                    response = "No argument specified";
+                    HistoryHandling.addToHistory(user, "Current");
+                }
+                else {
+                  response = GetCurrent(args[0]).Result;  
+                  HistoryHandling.addToHistory(user, "Current" + " " + string.Join("", args));
+                } 
             }
             else if (category.Contains("stats")) {
-                if (args == null) response = "No argument specified";
-                else response = GetStats(args[0]).Result;
+                if (args == null) {
+                    response = "No argument specified";
+                    HistoryHandling.addToHistory(user, "Stats");
+                }
+                else {
+                    response = GetStats(args[0]).Result;
+                    HistoryHandling.addToHistory(user, "Stats" + " " + string.Join("", args));
+                } 
+            }
+            else if (category.Contains("history")) {
+                if (user == null) {
+                    response = "User error!";
+                }
+                else {
+                    if (args == null) response = HistoryHandling.getHistory(user);
+                    else response = HistoryHandling.eraseHistory(user);
+                }
             }
             else if (category.Contains("help")) {
                 response = "Komenda Rok Runda";
+                HistoryHandling.addToHistory(user, "Help");
             }
 
             return response + "\n";
