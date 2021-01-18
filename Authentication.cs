@@ -1,17 +1,20 @@
 ﻿using System;
 using System.IO;
 using System.Data;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace TCP_Server_Asynchronous
 {
     public class Authentication
     {
+        private void AddHistory(string login) {
+            string data;
+
+            using (var sr = new StreamReader("user-history.json"))
+            {
+                data = sr.ReadToEnd();
+            }
+        }
         public static bool CreateUser(string login, string password)
         {
             string data;

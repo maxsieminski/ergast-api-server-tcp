@@ -1,0 +1,20 @@
+{
+  "AuthCodes": [
+    {
+      "login": "wielas",
+      "password": "wielas123"
+    },
+    {
+      "login": "maksi",
+      "password": "maksi123"
+    },
+    {
+      "login": "goatie",
+      "password": "goatie123"
+    },
+    {
+      "login": "dupa",
+      "password": "dupa"
+    }
+  ]
+}

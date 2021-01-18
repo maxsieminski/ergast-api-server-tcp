@@ -59,7 +59,10 @@ namespace TCP_Server_Asynchronous
         /// <param name="stream">Client stream</param>
         protected override void BeginDataTransmission(NetworkStream stream)
         {
+            string currentUser = null;
+
             bool authenticated = false;
+
             char[] separators = new char[]{' ', '\0'};
             byte[] buffer = new byte[Buffer_size];
             byte[] serverResponseBuffer = new byte[Buffer_size];
@@ -81,6 +84,7 @@ namespace TCP_Server_Asynchronous
                             if (Authentication.AuthenticateUser(login[1], login[2]) == 'y') 
                             {
                                 authenticated = true;
+                                currentUser = login[1];
                                 Console.WriteLine("Logged in!");
                             }
                         }
@@ -100,11 +104,13 @@ namespace TCP_Server_Asynchronous
                             }
                         }
 
+                        HistoryHandling.getHistory(currentUser);
+
                         if(message != null) 
                         {
                             if (message.Length == 1)
                             {
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], null));
+                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(message[0], null, currentUser));
                             }
                             else 
                             {
@@ -114,8 +120,8 @@ namespace TCP_Server_Asynchronous
                                 {
                                     arg[i] = arg[i].Replace("\0", string.Empty);
                                 }
-
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ApiConnector.GetRequest(message[0], arg));
+                                
+                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(message[0], arg, currentUser));
                             }
                             stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
                         }
