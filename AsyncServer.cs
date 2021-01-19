@@ -74,12 +74,12 @@ namespace TCP_Server_Asynchronous
                 try
                 {
                     if (!authenticated) {
-                        string loginFirstMsg = "Enter login [login] [password]\n or register [login] [password]: ";
-
+                        string loginFirstMsg = "Enter one of the following\nlogin [login] [password]\nregister [login] [password]\nregister admin [login] [password] [key]: ";
                         stream.Write(System.Text.Encoding.ASCII.GetBytes(loginFirstMsg), 0, loginFirstMsg.Length);
-                        stream.Read(buffer, 0, Buffer_size);
-                        string[] login  = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None); 
 
+                        stream.Read(buffer, 0, Buffer_size);
+                        string[] login  = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
+                        
                         if(login[0] == "login") {
                             if (Authentication.AuthenticateUser(login[1], login[2]) == 'y') 
                             {
@@ -88,8 +88,20 @@ namespace TCP_Server_Asynchronous
                                 Console.WriteLine("Logged in!");
                             }
                         }
-                        else if(login[0] == "register") {
-                            Authentication.CreateUser(login[1], login[2]);
+                        else if(login[0] == "register" && login[1] != "admin") {
+                            Authentication.CreateUser(login[1], login[2], false);
+                        }
+                        else if(login[0] == "register" && login[1] == "admin")
+                        {
+                            if (login[4] == "kiskes")
+                            {
+                                Authentication.CreateUser(login[2], login[3], true);
+                            }
+                            else
+                            {
+                                string wrong_key_message = "Wrong masterkey entered. Try again.\n";
+                                stream.Write(System.Text.Encoding.ASCII.GetBytes(wrong_key_message), 0, wrong_key_message.Length);
+                            }
                         }
                     }
                     else 
@@ -108,7 +120,13 @@ namespace TCP_Server_Asynchronous
 
                         if(message != null) 
                         {
-                            if (message.Length == 1)
+                            Console.WriteLine(message[0]);
+                            if (message[0].Substring(0, 10) == "printusers")
+                            {
+                                string response = Authentication.PrintUsers(currentUser);
+                                stream.Write(System.Text.Encoding.ASCII.GetBytes(response), 0, response.Length);
+                            }
+                            else if (message.Length == 1)
                             {
                                 serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(message[0], null, currentUser));
                             }

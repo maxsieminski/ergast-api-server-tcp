@@ -2,19 +2,23 @@
   "AuthCodes": [
     {
       "login": "wielas",
-      "password": "wielas123"
+      "password": "wielas123",
+      "is_admin": "True"
     },
     {
       "login": "maksi",
-      "password": "maksi123"
+      "password": "maksi123",
+      "is_admin": "True"
     },
     {
       "login": "goatie",
-      "password": "goatie123"
+      "password": "goatie123",
+      "is_admin": "False"
     },
     {
       "login": "dupa",
-      "password": "dupa"
+      "password": "dupa",
+      "is_admin": "False"
     }
   ]
 }
