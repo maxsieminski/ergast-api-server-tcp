@@ -178,15 +178,21 @@ namespace TCP_Server_Asynchronous
                     {
                         // this is where fun begins
                         is_deleted = NowDeleteUserfrfr(username, dataSet);
+                        if (is_deleted)
+                            return "Deleted. Wow you have so much power.\n";
+                        else
+                            return "User doesn't seem to exist. Watch your fat fingers.\n";
+
                     }
+                    else
+                        return "Not authenticated to delete users.\n";
                 }
             }
-            if (is_deleted)
-                return "Deleted. Wow you have so much power.\n";
+
             return "Something failed mate. C'est la vie.\n";
         }
 
-        private bool NowDeleteUserfrfr(string username, DataSet dataSet)
+        private static bool NowDeleteUserfrfr(string username, DataSet dataSet)
         {
             bool is_deleted = false;
             DataTable dataTable = dataSet.Tables["AuthCodes"];
@@ -222,6 +228,7 @@ namespace TCP_Server_Asynchronous
             dataSet1.AcceptChanges();
             string json1 = JsonConvert.SerializeObject(dataSet1, Formatting.Indented);
             File.WriteAllText("auth-codes.json", json1);
+            return is_deleted;
         }
     }
 }
