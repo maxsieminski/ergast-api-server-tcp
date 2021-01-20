@@ -63,56 +63,94 @@ namespace TCP_Server_Asynchronous
 
             bool authenticated = false;
 
-            char[] separators = new char[]{' ', '\0'};
+            char[] separators = new char[] { ' ', '\0' };
             byte[] buffer = new byte[Buffer_size];
             byte[] serverResponseBuffer = new byte[Buffer_size];
 
             string firstMessage = "Enter command : ";
 
-            while(true)
+            while (true)
             {
                 try
                 {
-                    if (!authenticated) {
-                        string loginFirstMsg = "Enter login [login] [password]\n or register [login] [password]: ";
-
+                    if (!authenticated)
+                    {
+                        string loginFirstMsg = "Enter one of the following\nlogin [login] [password]\nregister [login] [password]\nregister admin [login] [password] [key]: ";
                         stream.Write(System.Text.Encoding.ASCII.GetBytes(loginFirstMsg), 0, loginFirstMsg.Length);
-                        stream.Read(buffer, 0, Buffer_size);
-                        string[] login  = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None); 
 
-                        if(login[0] == "login") {
-                            if (Authentication.AuthenticateUser(login[1], login[2]) == 'y') 
+                        stream.Read(buffer, 0, Buffer_size);
+                        string[] login = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
+
+                        if (login[0] == "login")
+                        {
+                            if (Authentication.AuthenticateUser(login[1], login[2]) == 'y')
                             {
                                 authenticated = true;
                                 currentUser = login[1];
                                 Console.WriteLine("Logged in!");
                             }
                         }
-                        else if(login[0] == "register") {
-                            Authentication.CreateUser(login[1], login[2]);
+                        else if (login[0] == "register" && login[1] != "admin")
+                        {
+                            Authentication.CreateUser(login[1], login[2], false);
+                        }
+                        else if (login[0] == "register" && login[1] == "admin")
+                        {
+                            if (login[4] == "kiskes")
+                            {
+                                Authentication.CreateUser(login[2], login[3], true);
+                            }
+                            else
+                            {
+                                string wrong_key_message = "Wrong masterkey entered. Try again.\n";
+                                stream.Write(System.Text.Encoding.ASCII.GetBytes(wrong_key_message), 0, wrong_key_message.Length);
+                            }
                         }
                     }
-                    else 
+                    else
                     {
                         stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
                         stream.Read(buffer, 0, Buffer_size);
-                        string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();      
+                        string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();
 
-                        foreach(string s in message) {
-                            if (s.Contains((char)13)) {
+                        foreach (string s in message)
+                        {
+                            if (s.Contains((char)13))
+                            {
                                 message = null;
                             }
                         }
 
                         HistoryHandling.getHistory(currentUser);
 
-                        if(message != null) 
+                        if (message != null)
                         {
-                            if (message.Length == 1)
+                            Console.WriteLine(message[0]);
+                            if (message[0].Substring(0, 10) == "printusers")
                             {
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(message[0], null, currentUser));
+                                string response = Authentication.PrintUsers(currentUser);
+                                stream.Write(System.Text.Encoding.ASCII.GetBytes(response), 0, response.Length);
                             }
-                            else 
+                            else if (message[0].Substring(0, 10) == "deleteuser")
+                            {
+                                string somemess = "Enter username of who you want to delete big man.";
+                                stream.Write(System.Text.Encoding.ASCII.GetBytes(somemess), 0, somemess.Length);
+                                stream.Read(buffer, 0, Buffer_size); // sorry ja wiem ze to jest obrzydliwy kod, troche idc musze spac a to działa wyzej i nie pluje tych losowych charów jak message
+                                string[] someuser = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
+                                string delresponse = Authentication.DeleteUser(someuser[0], currentUser);
+                                stream.Write(System.Text.Encoding.ASCII.GetBytes(delresponse), 0, delresponse.Length);
+
+                            }
+
+                            else if (message[0].Substring(0, 7) == "komenda")
+                            {
+                                string mess = "Enter command you want to use big man.";
+                                stream.Write(System.Text.Encoding.ASCII.GetBytes(mess), 0, mess.Length);
+                                stream.Read(buffer, 0, Buffer_size);
+                                string[] komenda = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();
+                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(komenda[0], null, currentUser));
+                            }
+                            else
                             {
                                 string[] arg = message.Skip(1).Take(message.Length).ToArray();
 
@@ -120,7 +158,7 @@ namespace TCP_Server_Asynchronous
                                 {
                                     arg[i] = arg[i].Replace("\0", string.Empty);
                                 }
-                                
+
                                 serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(message[0], arg, currentUser));
                             }
                             stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
