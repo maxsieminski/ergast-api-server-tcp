@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace TCP_Server_Asynchronous
 { 
@@ -12,7 +13,7 @@ namespace TCP_Server_Asynchronous
         #region Fields
         IPAddress iPAddress;
         int port;
-        int buffer_size = 4096;
+        int buffer_size = 32;
         bool running;
         TcpListener tcpListener;
         TcpClient tcpClient;

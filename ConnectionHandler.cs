@@ -112,7 +112,7 @@ namespace TCP_Server_Asynchronous
             var request = new DriverStandingsRequest
             {
                 Season = String.IsNullOrEmpty(year) ? Seasons.Current : year,
-                Round = String.IsNullOrEmpty(round) ? "8" : round,
+                Round = String.IsNullOrEmpty(round) ? Rounds.Last : round,
             };
 
             try {
@@ -133,75 +133,39 @@ namespace TCP_Server_Asynchronous
             }
         }
 
-        public static string GetRequest(string category, string[]? args, string? user)
+        public static async Task<string> GetRequest(string category, string[]? args, string? user)
         {
-
             string response = "";
 
-            if (category.Contains("standings")) {
-                if (args == null) {
-                    response = GetDriverStandings("", "").Result;
-                    HistoryHandling.addToHistory(user, "Standings");
-                } 
-                else {
-                    response = GetDriverStandings(args[0], args[1]).Result;
-                    HistoryHandling.addToHistory(user, "Standings" + " " + string.Join("", args));
-                }
-            }
-            else if (category.Contains("driver")) {
-                if (args == null) {
-                    response = "No driver specified!";
-                    HistoryHandling.addToHistory(user, "Driver");
-                } 
-                else {
-                    response = GetDriverInfo(args[0]).Result;
-                    HistoryHandling.addToHistory(user, "Driver" + " " + string.Join("", args));
-                }
-            }
-            else if (category.Contains("schedule")) {
-                if (args == null) {
-                    response = GetSchedule("").Result;
-                    HistoryHandling.addToHistory(user, "Schedule");
-                }
-                else {
-                    response = GetSchedule(args[0]).Result;
-                    HistoryHandling.addToHistory(user, "Schedule" + " " + string.Join("", args));
-                }
-            }
-            else if (category.Contains("current")) {
-                if (args == null) {
-                    response = "No argument specified";
-                    HistoryHandling.addToHistory(user, "Current");
-                }
-                else {
-                  response = GetCurrent(args[0]).Result;  
-                  HistoryHandling.addToHistory(user, "Current" + " " + string.Join("", args));
-                } 
-            }
-            else if (category.Contains("stats")) {
-                if (args == null) {
-                    response = "No argument specified";
-                    HistoryHandling.addToHistory(user, "Stats");
-                }
-                else {
-                    response = GetStats(args[0]).Result;
-                    HistoryHandling.addToHistory(user, "Stats" + " " + string.Join("", args));
-                } 
-            }
-            else if (category.Contains("history")) {
-                if (user == null) {
-                    response = "User error!";
-                }
-                else {
-                    if (args == null) response = HistoryHandling.getHistory(user);
-                    else response = HistoryHandling.eraseHistory(user);
-                }
-            }
-            else if (category.Contains("help")) {
-                response = "Komenda Rok Runda";
-                HistoryHandling.addToHistory(user, "Help");
+            switch (category) {
+                case "standings":
+                    response = ((args[0] == null) ? GetDriverStandings("", "").Result : GetDriverStandings(args[0], args[1]).Result);
+                    break;
+                case "driver":
+                    response = (args[0] == null) ? "No driver specified!" : GetDriverInfo(args[0]).Result;
+                    break;
+                case "schedule":
+                    response = (args[0] == null) ? GetSchedule("").Result : response = GetSchedule(args[0]).Result;
+                    break;
+                case "current":
+                    response = (args[0] == null) ? "No argument specified" : GetCurrent(args[0]).Result;
+                    break;
+                case "stats":
+                    response = (args[0] == null) ? "No argument specified" : GetStats(args[0]).Result;
+                    break;
+                case "history":
+                    response = (user == null) ? "User error!" : HistoryHandling.getHistory(user);
+                    break;
+                case "printusers":
+                    break;
+                case "deleteuser":
+                    break;
+                case "help":
+                    response = "Komenda Rok Runda";
+                    break;    
             }
 
+            HistoryHandling.addToHistory(user, category + " " + ((args == null) ? "" : string.Join("", args)));
             return response + "\n";
         }
     }

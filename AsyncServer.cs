@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
+using System.Linq;
 using System.Net.Sockets;
+using System.Threading.Tasks;
+
 
 namespace TCP_Server_Asynchronous
 {
@@ -9,6 +11,10 @@ namespace TCP_Server_Asynchronous
     {
 
         #region Fields
+
+        const string firstMessage = "Enter command : ";
+        const string loginFirstMessage = "Enter one of the following\nlogin [login] [password]\nregister [login] [password]:";
+        const string adminMasterPassword = "kiskes";
 
         #endregion
 
@@ -52,118 +58,97 @@ namespace TCP_Server_Asynchronous
             TcpClient.Close();
         }
 
+        /// <summary>
+        /// Takes incoming messages while user isn't authorized and returns if his credentials are correct
+        /// </summary>
+        /// <param name="message">Client message</param>
+        private bool CheckCredentials(string[] message) {
+            foreach (var item in message)
+            {
+                Console.WriteLine(item);
+            }
+            if(message[0] == "login") return (Authentication.AuthenticateUser(message[1], message[2]) == 'y');
+            else if (message[0] == "register") return (Authentication.CreateUser(message[1], message[2], message[4] == adminMasterPassword));
+
+            return false;
+        }
 
         /// <summary>
         /// Takes incoming messages and returns answer
         /// </summary>
         /// <param name="stream">Client stream</param>
-        protected override void BeginDataTransmission(NetworkStream stream)
+        protected override async void BeginDataTransmission(NetworkStream stream)
         {
             string currentUser = null;
+            bool isAuthenticated = false;
 
-            bool authenticated = false;
-
-            char[] separators = new char[] { ' ', '\0' };
             byte[] buffer = new byte[Buffer_size];
             byte[] serverResponseBuffer = new byte[Buffer_size];
-
-            string firstMessage = "Enter command : ";
 
             while (true)
             {
                 try
                 {
-                    if (!authenticated)
+                    string serverMessage = (isAuthenticated) ? firstMessage : loginFirstMessage;
+
+                    stream.Write(System.Text.Encoding.ASCII.GetBytes(serverMessage), 0, serverMessage.Length);
+                    stream.Read(buffer, 0, Buffer_size);
+
+                    /*
+                    If message starts with ASCII control character, it is ignored since
+                    it does not represent a user message, but rather how client application
+                    (e.g. PuTTY) works.
+                    */
+                    if (Int32.Parse(buffer[0].ToString()) < 33) 
                     {
-                        string loginFirstMsg = "Enter one of the following\nlogin [login] [password]\nregister [login] [password]\nregister admin [login] [password] [key]: ";
-                        stream.Write(System.Text.Encoding.ASCII.GetBytes(loginFirstMsg), 0, loginFirstMsg.Length);
+                        buffer = new byte[Buffer_size];
+                        continue;
+                    }
 
-                        stream.Read(buffer, 0, Buffer_size);
-                        string[] login = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
+                    string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(' ');
+                    string[] args = null;
 
-                        if (login[0] == "login")
-                        {
-                            if (Authentication.AuthenticateUser(login[1], login[2]) == 'y')
-                            {
-                                authenticated = true;
-                                currentUser = login[1];
-                                Console.WriteLine("Logged in!");
-                            }
-                        }
-                        else if (login[0] == "register" && login[1] != "admin")
-                        {
-                            Authentication.CreateUser(login[1], login[2], false);
-                        }
-                        else if (login[0] == "register" && login[1] == "admin")
-                        {
-                            if (login[4] == "kiskes")
-                            {
-                                Authentication.CreateUser(login[2], login[3], true);
-                            }
-                            else
-                            {
-                                string wrong_key_message = "Wrong masterkey entered. Try again.\n";
-                                stream.Write(System.Text.Encoding.ASCII.GetBytes(wrong_key_message), 0, wrong_key_message.Length);
-                            }
+                    Console.WriteLine(message.Length);
+
+                    if (!isAuthenticated) {
+                        if (CheckCredentials(message)) {
+                            currentUser = message[1];
+                            isAuthenticated = true;
                         }
                     }
-                    else
-                    {
-                        stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
-                        stream.Read(buffer, 0, Buffer_size);
-                        string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();
 
-                        foreach (string s in message)
-                        {
-                            if (s.Contains((char)13))
-                            {
-                                message = null;
-                            }
+                    // if (message[0].Substring(0, 10) == "printusers")
+                    // {
+                    //     string response = Authentication.PrintUsers(currentUser);
+                    //     stream.Write(System.Text.Encoding.ASCII.GetBytes(response), 0, response.Length);
+                    // }
+                    // else if (message[0].Substring(0, 10) == "deleteuser")
+                    // {
+                    //     string somemess = "Enter username of who you want to delete big man.";
+                    //     stream.Write(System.Text.Encoding.ASCII.GetBytes(somemess), 0, somemess.Length);
+                    //     stream.Read(buffer, 0, Buffer_size); // sorry ja wiem ze to jest obrzydliwy kod, troche idc musze spac a to działa wyzej i nie pluje tych losowych charów jak message
+                    //     string[] someuser = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
+                    //     string delresponse = Authentication.DeleteUser(someuser[0], currentUser);
+                    //     stream.Write(System.Text.Encoding.ASCII.GetBytes(delresponse), 0, delresponse.Length);
+
+                    // }
+                    // else
+                    // {
+
+                        
+                        if (message.Length > 1) {
+                            args = message.Skip(1).Take(message.Length - 1).ToArray();
+
+                            /*
+                            Incoming byte buffer fills remaining space with Null characters.
+                            We get rid of them on this line.
+                            */
+                            args[args.Length - 1] = args[args.Length - 1].Replace("\0", String.Empty);
                         }
 
-                        HistoryHandling.getHistory(currentUser);
-
-                        if (message != null)
-                        {
-                            Console.WriteLine(message[0]);
-                            if (message[0].Substring(0, 10) == "printusers")
-                            {
-                                string response = Authentication.PrintUsers(currentUser);
-                                stream.Write(System.Text.Encoding.ASCII.GetBytes(response), 0, response.Length);
-                            }
-                            else if (message[0].Substring(0, 10) == "deleteuser")
-                            {
-                                string somemess = "Enter username of who you want to delete big man.";
-                                stream.Write(System.Text.Encoding.ASCII.GetBytes(somemess), 0, somemess.Length);
-                                stream.Read(buffer, 0, Buffer_size); // sorry ja wiem ze to jest obrzydliwy kod, troche idc musze spac a to działa wyzej i nie pluje tych losowych charów jak message
-                                string[] someuser = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
-                                string delresponse = Authentication.DeleteUser(someuser[0], currentUser);
-                                stream.Write(System.Text.Encoding.ASCII.GetBytes(delresponse), 0, delresponse.Length);
-
-                            }
-
-                            else if (message[0].Substring(0, 7) == "komenda")
-                            {
-                                string mess = "Enter command you want to use big man.";
-                                stream.Write(System.Text.Encoding.ASCII.GetBytes(mess), 0, mess.Length);
-                                stream.Read(buffer, 0, Buffer_size);
-                                string[] komenda = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(komenda[0], null, currentUser));
-                            }
-                            else
-                            {
-                                string[] arg = message.Skip(1).Take(message.Length).ToArray();
-
-                                for (int i = 0; i < arg.Length; i++)
-                                {
-                                    arg[i] = arg[i].Replace("\0", string.Empty);
-                                }
-
-                                serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(ConnectionHandler.GetRequest(message[0], arg, currentUser));
-                            }
-                            stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
-                        }
-                    }
+                        serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(await ConnectionHandler.GetRequest(message[0], (args == null) ? null : args, currentUser));
+                    // }
+                    stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
                 }
                 catch (Exception e)
                 {
