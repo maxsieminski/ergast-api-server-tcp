@@ -132,22 +132,18 @@ namespace TCP_Server_Asynchronous
                     //     stream.Write(System.Text.Encoding.ASCII.GetBytes(delresponse), 0, delresponse.Length);
 
                     // }
-                    // else
-                    // {
-
                         
-                        if (message.Length > 1) {
-                            args = message.Skip(1).Take(message.Length - 1).ToArray();
+                    if (message.Length > 1) {
+                        args = message.Skip(1).Take(message.Length - 1).ToArray();
 
-                            /*
-                            Incoming byte buffer fills remaining space with Null characters.
-                            We get rid of them on this line.
-                            */
-                            args[args.Length - 1] = args[args.Length - 1].Replace("\0", String.Empty);
-                        }
+                        /*
+                        Incoming byte buffer fills remaining space with Null characters.
+                        We get rid of them on this line.
+                        */
+                        args[args.Length - 1] = args[args.Length - 1].Replace("\0", String.Empty);
+                    }
 
-                        serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(await ConnectionHandler.GetRequest(message[0], (args == null) ? null : args, currentUser));
-                    // }
+                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(await ConnectionHandler.GetRequest(message[0], (args == null) ? null : args, currentUser));
                     stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
                 }
                 catch (Exception e)
