@@ -63,10 +63,6 @@ namespace TCP_Server_Asynchronous
         /// </summary>
         /// <param name="message">Client message</param>
         private bool CheckCredentials(string[] message) {
-            foreach (var item in message)
-            {
-                Console.WriteLine(item);
-            }
             if(message[0] == "login") return (Authentication.AuthenticateUser(message[1], message[2]) == 'y');
             else if (message[0] == "register") return (Authentication.CreateUser(message[1], message[2], message[4] == adminMasterPassword));
 
@@ -107,8 +103,6 @@ namespace TCP_Server_Asynchronous
 
                     string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(' ');
                     string[] args = null;
-
-                    Console.WriteLine(message.Length);
 
                     if (!isAuthenticated) {
                         if (CheckCredentials(message)) {
