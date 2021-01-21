@@ -7,7 +7,7 @@ namespace TCP_Server_Asynchronous
 {
     public class Authentication
     {
-        private void AddHistory(string login)
+        private void CreateUserHistory(string login)
         {
             string data;
 
