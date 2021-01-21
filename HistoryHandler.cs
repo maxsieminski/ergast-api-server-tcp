@@ -10,7 +10,21 @@ namespace TCP_Server_Asynchronous
             public string name;
             public List<string> history;
         }
+        public static void addUser(string username)
+        {
+            var userHistory = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("user-history.json"));
+            string userHistoryserial = "[\n";
+            foreach (User u in userHistory)
+            {
+                userHistoryserial += JsonConvert.SerializeObject(u, Formatting.Indented) + ",\n";
+            }
+            User newuser = new User();
+            newuser.name = username;
+            newuser.history = new List<string>();
 
+            userHistoryserial += JsonConvert.SerializeObject(newuser, Formatting.Indented) + "\n]";
+            File.WriteAllText("user-history.json", userHistoryserial);
+        }
         /// <summary>
         /// Adds user input to his history. 
         /// </summary>
