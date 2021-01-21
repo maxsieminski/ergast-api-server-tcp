@@ -71,6 +71,9 @@ namespace TCP_Server_Asynchronous
 
             Console.WriteLine(json1);
             File.WriteAllText("auth-codes.json", json1);
+
+            HistoryHandler.addUser(login);
+
             return true;
         }
 

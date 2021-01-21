@@ -1,7 +1,9 @@
+using System;
 using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
- 
+using System.Data;
+
 namespace TCP_Server_Asynchronous
 {
     class HistoryHandler {
@@ -9,6 +11,23 @@ namespace TCP_Server_Asynchronous
         private class User {
             public string name;
             public List<string> history;
+        }
+
+        public static void addUser(string username)
+        {
+            var userHistory = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("user-history.json"));
+            string userHistoryserial = "[\n";
+            foreach (User u in userHistory)
+            {
+                userHistoryserial += JsonConvert.SerializeObject(u, Formatting.Indented) + ",\n";
+            }
+            User newuser = new User();
+            newuser.name = username;
+            newuser.history = new List<string>();
+            newuser.history.Add("samplehistory");
+
+            userHistoryserial += JsonConvert.SerializeObject(newuser, Formatting.Indented) + "\n]";
+            File.WriteAllText("user-history.json", userHistoryserial);
         }
 
         public static void addToHistory(string user, string command) {
