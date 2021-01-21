@@ -14,11 +14,6 @@
         "login": "goatie",
         "password": "goatie123",
         "is_admin": "False"
-      },
-      {
-        "login": "dupa",
-        "password": "dupa",
-        "is_admin": "False"
       }
     ]
   }
