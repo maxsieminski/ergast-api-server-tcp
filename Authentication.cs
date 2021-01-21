@@ -94,7 +94,7 @@ namespace TCP_Server_Asynchronous
 
             DataTable dataTable = dataSet.Tables["AuthCodes"];
 
-            Console.WriteLine(dataTable.Rows.Count);
+            //Console.WriteLine(dataTable.Rows.Count);
 
             foreach (DataRow row in dataTable.Rows)
             {
@@ -156,7 +156,7 @@ namespace TCP_Server_Asynchronous
 
         }
 
-        public static string DeleteUser(string username, string currentUser)
+        public static string DeleteUser(string currentUser, string username = "someuser")
         {
             string data;
             bool is_deleted = false;

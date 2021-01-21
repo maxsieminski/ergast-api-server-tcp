@@ -76,11 +76,14 @@ namespace TCP_Server_Asynchronous
                     if (!authenticated) {
                         string loginFirstMsg = "Enter one of the following\nlogin [login] [password]\nregister [login] [password]\nregister admin [login] [password] [key]: ";
                         stream.Write(System.Text.Encoding.ASCII.GetBytes(loginFirstMsg), 0, loginFirstMsg.Length);
-
                         stream.Read(buffer, 0, Buffer_size);
                         string[] login  = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
-                        
-                        if(login[0] == "login") {
+                        Console.WriteLine(login[0]);
+                        Console.WriteLine(login[1]);
+                        Console.WriteLine(login[2]);
+
+
+                        if (login[0] == "login") {
                             if (Authentication.AuthenticateUser(login[1], login[2]) == 'y') 
                             {
                                 authenticated = true;
@@ -106,11 +109,13 @@ namespace TCP_Server_Asynchronous
                     }
                     else 
                     {
+                        stream.Flush();
                         stream.Write(System.Text.Encoding.ASCII.GetBytes(firstMessage), 0, firstMessage.Length);
                         stream.Read(buffer, 0, Buffer_size);
-                        string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();      
+                        //string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None).Select(s => s.ToLowerInvariant()).ToArray();   
+                        string[] message  = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
 
-                        foreach(string s in message) {
+                        foreach (string s in message) {
                             if (s.Contains((char)13)) {
                                 message = null;
                             }
@@ -120,7 +125,8 @@ namespace TCP_Server_Asynchronous
 
                         if(message != null) 
                         {
-                            Console.WriteLine(message[0]);
+                            Console.WriteLine(message[0].Substring(0, 10));
+                            Console.WriteLine(message[1]);
                             if (message[0].Substring(0, 10) == "printusers")
                             {
                                 string response = Authentication.PrintUsers(currentUser);
@@ -128,11 +134,13 @@ namespace TCP_Server_Asynchronous
                             }
                             else if (message[0].Substring(0, 10) == "deleteuser")
                             {
-                                string somemess = "Enter username of who you want to delete big man.";
-                                stream.Write(System.Text.Encoding.ASCII.GetBytes(somemess), 0, somemess.Length);
-                                stream.Read(buffer, 0, Buffer_size); // sorry ja wiem ze to jest obrzydliwy kod, troche idc musze spac a to działa wyzej i nie pluje tych losowych charów jak message
-                                string[] someuser = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
-                                string delresponse = Authentication.DeleteUser(someuser[0], currentUser);
+                                //string somemess = "Enter username of who you want to delete big man.";
+                                //stream.Write(System.Text.Encoding.ASCII.GetBytes(somemess), 0, somemess.Length);
+                                //stream.Read(buffer, 0, Buffer_size); // sorry ja wiem ze to jest obrzydliwy kod, troche idc musze spac a to działa wyzej i nie pluje tych losowych charów jak message
+                                //string[] someuser = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
+                                //string delresponse = Authentication.DeleteUser(someuser[0], currentUser);
+                                
+                                string delresponse = Authentication.DeleteUser(currentUser, message[1]);
                                 stream.Write(System.Text.Encoding.ASCII.GetBytes(delresponse), 0, delresponse.Length);
 
                             }
