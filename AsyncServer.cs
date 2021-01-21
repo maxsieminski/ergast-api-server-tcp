@@ -3,7 +3,7 @@ using System.Net;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
+
 
 namespace TCP_Server_Asynchronous
 {
@@ -63,13 +63,8 @@ namespace TCP_Server_Asynchronous
         /// </summary>
         /// <param name="message">Client message</param>
         private bool CheckCredentials(string[] message) {
-            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
-            for (int i = 0; i < message.Length; i++)
-            {
-                message[i] = rgx.Replace(message[i], "");
-            }
-            if ((string)message[0] == "login") return (Authentication.AuthenticateUser((string)message[1], (string)message[2]) == 'y');
-            else if (message[0] == "register") return (Authentication.CreateUser(message[1], message[2], message[4] == adminMasterPassword));
+            if(message[0] == "login") return (Authentication.AuthenticateUser(message[1], message[2]) == 'y');
+            else if (message[0] == "register") return (Authentication.CreateUser(message[1], message[2], (message.Length == 4) ? message[3] == adminMasterPassword : false));
 
             return false;
         }
@@ -109,6 +104,11 @@ namespace TCP_Server_Asynchronous
                     string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(' ');
                     string[] args = null;
 
+                    /*
+                    Incoming byte buffer fills remaining space with Null characters.
+                    We get rid of them on this line.
+                    */
+                    message[message.Length - 1] = message[message.Length - 1].Replace("\0", String.Empty);
 
                     if (!isAuthenticated) {
                         if (CheckCredentials(message)) {
@@ -133,22 +133,14 @@ namespace TCP_Server_Asynchronous
 
                     // }
                         
-                    if (message.Length > 1) {
-                        args = message.Skip(1).Take(message.Length - 1).ToArray();
-
-                        /*
-                        Incoming byte buffer fills remaining space with Null characters.
-                        We get rid of them on this line.
-                        */
-                        args[args.Length - 1] = args[args.Length - 1].Replace("\0", String.Empty);
-                    }
+                    if (message.Length > 1) args = message.Skip(1).Take(message.Length - 1).ToArray();
 
                     serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(await ConnectionHandler.GetRequest(message[0], (args == null) ? null : args, currentUser));
                     stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
                 }
-                catch (Exception e)
+                catch (Exception exception)
                 {
-                    Console.WriteLine(e);
+                    Console.WriteLine(exception);
                     System.Environment.Exit(1);
                 }
             }
