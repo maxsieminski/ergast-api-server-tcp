@@ -2,8 +2,6 @@
 using System.Net;
 using System.Linq;
 using System.Net.Sockets;
-using System.Threading.Tasks;
-
 
 namespace TCP_Server_Asynchronous
 {
@@ -123,14 +121,10 @@ namespace TCP_Server_Asynchronous
                         
                     if (message.Length > 1) args = message.Skip(1).Take(message.Length - 1).ToArray();
 
-                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(await ConnectionHandler.GetRequest(message[0], (args == null) ? null : args, currentUser));
+                    serverResponseBuffer = System.Text.Encoding.ASCII.GetBytes(await ConnectionHandler.GetRequestResponse(message[0], (args == null) ? null : args, currentUser));
                     stream.Write(serverResponseBuffer, 0, serverResponseBuffer.Length);
                 }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception);
-                    System.Environment.Exit(1);
-                }
+                catch (Exception) {}
             }
         }
 

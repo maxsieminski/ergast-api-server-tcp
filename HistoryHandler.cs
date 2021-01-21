@@ -11,6 +11,11 @@ namespace TCP_Server_Asynchronous
             public List<string> history;
         }
 
+        /// <summary>
+        /// Adds user input to his history. 
+        /// </summary>
+        /// <param name="user">Current user.</param>
+        /// <param name="command">Current user input.</param>
         public static void addToHistory(string user, string command) {
             var userHistory = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("user-history.json"));
 
@@ -24,6 +29,11 @@ namespace TCP_Server_Asynchronous
             File.WriteAllText("user-history.json", userHistorySaved);
         }
 
+
+        /// <summary>
+        /// Displays command history for the current user. 
+        /// </summary>
+        /// <param name="user">Current user.</param>
         public static string getHistory(string user) {
             var userHistory = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("user-history.json"));
 
@@ -41,6 +51,10 @@ namespace TCP_Server_Asynchronous
             return "History model error";
         }
 
+        /// <summary>
+        /// Deletes command history for the current user. 
+        /// </summary>
+        /// <param name="user">Current user.</param>
         public static string eraseHistory(string user) {
             var userHistory = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("user-history.json"));
 
