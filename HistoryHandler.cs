@@ -4,7 +4,7 @@ using System.Collections.Generic;
  
 namespace TCP_Server_Asynchronous
 {
-    class HistoryHandling {
+    class HistoryHandler {
         
         private class User {
             public string name;

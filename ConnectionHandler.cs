@@ -154,7 +154,7 @@ namespace TCP_Server_Asynchronous
                     response = (args[0] == null) ? "No argument specified" : GetStats(args[0]).Result;
                     break;
                 case "history":
-                    response = (user == null) ? "User error!" : HistoryHandling.getHistory(user);
+                    response = (user == null) ? "User error!" : HistoryHandler.getHistory(user);
                     break;
                 case "printusers":
                     break;
@@ -165,7 +165,7 @@ namespace TCP_Server_Asynchronous
                     break;    
             }
 
-            HistoryHandling.addToHistory(user, category + " " + ((args == null) ? "" : string.Join("", args)));
+            HistoryHandler.addToHistory(user, category + " " + ((args == null) ? "" : string.Join("", args)));
             return response + "\n";
         }
     }
