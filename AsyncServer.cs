@@ -3,7 +3,7 @@ using System.Net;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-
+using System.Text.RegularExpressions;
 
 namespace TCP_Server_Asynchronous
 {
@@ -63,7 +63,12 @@ namespace TCP_Server_Asynchronous
         /// </summary>
         /// <param name="message">Client message</param>
         private bool CheckCredentials(string[] message) {
-            if(message[0] == "login") return (Authentication.AuthenticateUser(message[1], message[2]) == 'y');
+            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+            for (int i = 0; i < message.Length; i++)
+            {
+                message[i] = rgx.Replace(message[i], "");
+            }
+            if ((string)message[0] == "login") return (Authentication.AuthenticateUser((string)message[1], (string)message[2]) == 'y');
             else if (message[0] == "register") return (Authentication.CreateUser(message[1], message[2], message[4] == adminMasterPassword));
 
             return false;
@@ -103,6 +108,7 @@ namespace TCP_Server_Asynchronous
 
                     string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(' ');
                     string[] args = null;
+
 
                     if (!isAuthenticated) {
                         if (CheckCredentials(message)) {

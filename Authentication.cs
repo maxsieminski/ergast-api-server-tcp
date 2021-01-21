@@ -2,6 +2,7 @@
 using System.IO;
 using System.Data;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace TCP_Server_Asynchronous
 {
@@ -55,8 +56,7 @@ namespace TCP_Server_Asynchronous
                 table.Rows.Add(newRow);
             }
 
-            if (is_admin) adminstring = "True";
-            else adminstring = "False";
+            adminstring = (is_admin) ? "True" : "False";
 
             Console.WriteLine("Creating new User!");
 
@@ -94,20 +94,24 @@ namespace TCP_Server_Asynchronous
 
             DataTable dataTable = dataSet.Tables["AuthCodes"];
 
-            Console.WriteLine(dataTable.Rows.Count);
-
             foreach (DataRow row in dataTable.Rows)
             {
 
                 if ((string)row["login"] == login)
                 {
+                    Console.WriteLine(row["password"].ToString().Length);
+                    Console.WriteLine(password.Length);
                     userfound = true;
                     if ((string)row["password"] == password)
                     {
                         authorized = true;
+                        return 'y';
                     }
-                    else Console.WriteLine("Password not matching");
-                    break;
+                    else
+                    {
+                        Console.WriteLine("Password not matching");
+                        return 'w';
+                    }
                 }
             }
 
@@ -115,11 +119,6 @@ namespace TCP_Server_Asynchronous
             {
                 Console.WriteLine("User not found");
                 return 'x';
-            }
-            if (!authorized && userfound)
-            {
-                Console.WriteLine("User not found");
-                return 'w';
             }
 
             return 'y';
