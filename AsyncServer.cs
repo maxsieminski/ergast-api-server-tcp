@@ -116,22 +116,10 @@ namespace TCP_Server_Asynchronous
                             isAuthenticated = true;
                         }
                     }
-
-                    // if (message[0].Substring(0, 10) == "printusers")
-                    // {
-                    //     string response = Authentication.PrintUsers(currentUser);
-                    //     stream.Write(System.Text.Encoding.ASCII.GetBytes(response), 0, response.Length);
-                    // }
-                    // else if (message[0].Substring(0, 10) == "deleteuser")
-                    // {
-                    //     string somemess = "Enter username of who you want to delete big man.";
-                    //     stream.Write(System.Text.Encoding.ASCII.GetBytes(somemess), 0, somemess.Length);
-                    //     stream.Read(buffer, 0, Buffer_size); // sorry ja wiem ze to jest obrzydliwy kod, troche idc musze spac a to działa wyzej i nie pluje tych losowych charów jak message
-                    //     string[] someuser = System.Text.Encoding.ASCII.GetString(buffer).Split(separators, StringSplitOptions.None);
-                    //     string delresponse = Authentication.DeleteUser(someuser[0], currentUser);
-                    //     stream.Write(System.Text.Encoding.ASCII.GetBytes(delresponse), 0, delresponse.Length);
-
-                    // }
+                    if (isAuthenticated && message[0] == "logout") {
+                        currentUser = null;
+                        isAuthenticated = false;
+                    }
                         
                     if (message.Length > 1) args = message.Skip(1).Take(message.Length - 1).ToArray();
 

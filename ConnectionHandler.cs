@@ -139,26 +139,28 @@ namespace TCP_Server_Asynchronous
 
             switch (category) {
                 case "standings":
-                    response = ((args[0] == null) ? GetDriverStandings("", "").Result : GetDriverStandings(args[0], args[1]).Result);
+                    response = (args == null) ? GetDriverStandings("", "").Result : GetDriverStandings(args[0], args[1]).Result;
                     break;
                 case "driver":
-                    response = (args[0] == null) ? "No driver specified!" : GetDriverInfo(args[0]).Result;
+                    response = (args == null) ? "No driver specified!" : GetDriverInfo(args[0]).Result;
                     break;
                 case "schedule":
-                    response = (args[0] == null) ? GetSchedule("").Result : response = GetSchedule(args[0]).Result;
+                    response = (args == null) ? GetSchedule("").Result : response = GetSchedule(args[0]).Result;
                     break;
                 case "current":
-                    response = (args[0] == null) ? "No argument specified" : GetCurrent(args[0]).Result;
+                    response = (args == null) ? "No argument specified" : GetCurrent(args[0]).Result;
                     break;
                 case "stats":
-                    response = (args[0] == null) ? "No argument specified" : GetStats(args[0]).Result;
+                    response = (args == null) ? "No argument specified" : GetStats(args[0]).Result;
                     break;
                 case "history":
                     response = (user == null) ? "User error!" : HistoryHandler.getHistory(user);
                     break;
                 case "printusers":
+                    response = (user == null) ? "User error!" : Authentication.GetUsers(user);
                     break;
                 case "deleteuser":
+                    response = (args == null) ? "User error!" : Authentication.DeleteUser(args[0], user);
                     break;
                 case "help":
                     response = "Komenda Rok Runda";

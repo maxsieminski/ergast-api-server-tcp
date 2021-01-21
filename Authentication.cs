@@ -123,7 +123,7 @@ namespace TCP_Server_Asynchronous
             return 'y';
         }
 
-        public static string PrintUsers(string currentUser)
+        public static string GetUsers(string currentUser)
         {
             string data;
 
@@ -143,7 +143,7 @@ namespace TCP_Server_Asynchronous
                     if ((string)row["is_admin"] == "True")
                     {
                         string json = JsonConvert.SerializeObject(dataSet, Formatting.Indented);
-                        return json; // not messing with oneliners oh no
+                        return json; 
                     }
                     else
                         return "Not authenticated to view users.\n";
