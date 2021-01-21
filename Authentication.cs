@@ -16,6 +16,13 @@ namespace TCP_Server_Asynchronous
                 data = sr.ReadToEnd();
             }
         }
+
+        /// <summary>
+        /// Creates new user.
+        /// </summary>
+        /// <param name="login">User login</param>
+        /// <param name="password">User password</param>        
+        /// <param name="is_admin">Is user set to administrator</param>   
         public static bool CreateUser(string login, string password, bool is_admin)
         {
             string data;
@@ -29,8 +36,6 @@ namespace TCP_Server_Asynchronous
             DataSet dataSet = JsonConvert.DeserializeObject<DataSet>(data);
 
             DataTable dataTable = dataSet.Tables["AuthCodes"];
-
-            //Console.WriteLine(dataTable.Rows.Count);
 
             DataSet dataSet1 = new DataSet("dataSet");
             dataSet1.Namespace = "NetFrameWork";
@@ -74,6 +79,11 @@ namespace TCP_Server_Asynchronous
             return true;
         }
 
+        /// <summary>
+        /// Checks if passed credentials are correct.
+        /// </summary>
+        /// <param name="login">User login</param>
+        /// <param name="password">User password</param>
         public static char AuthenticateUser(string login, string password)
         {
             // 'y' --> zalogowano
@@ -123,6 +133,10 @@ namespace TCP_Server_Asynchronous
             return 'y';
         }
 
+        /// <summary>
+        /// Returns a list of registered users. Caller must be admin.
+        /// </summary>
+        /// <param name="currentUser">User that calls the function</param>
         public static string GetUsers(string currentUser)
         {
             string data;
@@ -154,10 +168,14 @@ namespace TCP_Server_Asynchronous
 
         }
 
+        /// <summary>
+        /// Verifies that caller is an admin and calls for delete function.
+        /// </summary>
+        /// <param name="username">User to be deleted.</param>
+        /// <param name="currentUser">Caller of a function.</param>
         public static string DeleteUser(string username, string currentUser)
         {
             string data;
-            bool is_deleted = false;
 
             using (var sr = new StreamReader("auth-codes.json"))
             {
@@ -171,12 +189,9 @@ namespace TCP_Server_Asynchronous
             {
                 if ((string)row["login"] == currentUser)
                 {
-
                     if ((string)row["is_admin"] == "True")
                     {
-                        // this is where fun begins
-                        is_deleted = NowDeleteUserfrfr(username, dataSet);
-                        if (is_deleted)
+                        if (NowDeleteUserfrfr(username, dataSet))
                             return "Deleted. Wow you have so much power.\n";
                         else
                             return "User doesn't seem to exist. Watch your fat fingers.\n";
@@ -190,6 +205,11 @@ namespace TCP_Server_Asynchronous
             return "Something failed mate. C'est la vie.\n";
         }
 
+        /// <summary>
+        /// Deletes specified user.
+        /// </summary>
+        /// <param name="username">User to be deleted.</param>
+        /// <param name="dataSet">DataSet of registered users.</param>
         private static bool NowDeleteUserfrfr(string username, DataSet dataSet)
         {
             bool is_deleted = false;
