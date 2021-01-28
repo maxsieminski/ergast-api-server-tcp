@@ -79,10 +79,6 @@ namespace TCP_Server_Asynchronous
         /// <param name="password">User password</param>
         public static char AuthenticateUser(string login, string password)
         {
-            // 'y' --> zalogowano
-            // 'x' --> nie ma użytkownika
-            // 'w' --> złe hasło
-
             bool userfound = false;
             string data;
             bool authorized = false;
