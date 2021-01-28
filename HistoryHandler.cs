@@ -70,25 +70,5 @@ namespace TCP_Server_Asynchronous
 
             return "History model error";
         }
-
-        /// <summary>
-        /// Deletes command history for the current user. 
-        /// </summary>
-        /// <param name="user">Current user.</param>
-        public static string eraseHistory(string user) {
-            var userHistory = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("user-history.json"));
-
-            foreach (User u in userHistory) {
-                if (u.name == user) {
-                    u.history = new List<string>{};
-                }
-            }
-
-            JsonConvert.SerializeObject(userHistory, Formatting.Indented);
-            var userHistorySaved = JsonConvert.SerializeObject(userHistory, Formatting.Indented);
-            File.WriteAllText("user-history.json", userHistorySaved);
-
-            return "Success!";
-        }
     }
 }
