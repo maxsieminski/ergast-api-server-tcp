@@ -75,6 +75,7 @@ namespace TCP_Server_Asynchronous
         {
             string currentUser = null;
             bool isAuthenticated = false;
+            bool lastMessageWasEmpty = false;
 
             byte[] buffer = new byte[Buffer_size];
             byte[] serverResponseBuffer = new byte[Buffer_size];
@@ -85,7 +86,10 @@ namespace TCP_Server_Asynchronous
                 {
                     string serverMessage = (isAuthenticated) ? firstMessage : loginFirstMessage;
 
-                    stream.Write(System.Text.Encoding.ASCII.GetBytes(serverMessage), 0, serverMessage.Length);
+                    if (!lastMessageWasEmpty)
+                    {
+                        stream.Write(System.Text.Encoding.ASCII.GetBytes(serverMessage), 0, serverMessage.Length);
+                    }
                     stream.Read(buffer, 0, Buffer_size);
 
                     /*
@@ -96,8 +100,11 @@ namespace TCP_Server_Asynchronous
                     if (Int32.Parse(buffer[0].ToString()) < 33) 
                     {
                         buffer = new byte[Buffer_size];
+                        lastMessageWasEmpty = true;
                         continue;
                     }
+
+                    lastMessageWasEmpty = false;
 
                     string[] message = System.Text.Encoding.ASCII.GetString(buffer).Split(' ');
                     string[] args = null;
