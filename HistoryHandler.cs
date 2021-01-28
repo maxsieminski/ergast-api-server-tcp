@@ -10,6 +10,11 @@ namespace TCP_Server_Asynchronous
             public string name;
             public List<string> history;
         }
+
+        /// <summary>
+        /// Creates new user in user history database. 
+        /// </summary>
+        /// <param name="username">Current user.</param>
         public static void addUser(string username)
         {
             var userHistory = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText("user-history.json"));
@@ -25,6 +30,7 @@ namespace TCP_Server_Asynchronous
             userHistoryserial += JsonConvert.SerializeObject(newuser, Formatting.Indented) + "\n]";
             File.WriteAllText("user-history.json", userHistoryserial);
         }
+
         /// <summary>
         /// Adds user input to his history. 
         /// </summary>

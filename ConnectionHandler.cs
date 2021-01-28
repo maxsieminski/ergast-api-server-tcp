@@ -35,9 +35,9 @@ namespace TCP_Server_Asynchronous
 
                 foreach (var element in standingsResponse)
                 {
-                    response += String.Format("{0}  {1}  {2}  {3}  {4}\n", element.Position, element.Constructor, element.Wins, element.Points);
+                    response += String.Format("{0}  {1}  {2}  {3}\n", element.Position, element.Constructor.Name, element.Wins, element.Points);
                 }
-                
+
                 return response;
             } catch (System.Net.Http.HttpRequestException) {
                 return "HTTP ERROR!";
@@ -207,7 +207,7 @@ namespace TCP_Server_Asynchronous
                     response = (args == null) ? "No driver specified!" : GetDriverInfo(args[0]).Result;
                     break;
                 case "schedule":
-                    response = (args == null) ? GetSchedule("").Result : response = GetSchedule(args[0]).Result;
+                    response = (args == null) ? GetSchedule("").Result : GetSchedule(args[0]).Result;
                     break;
                 case "current":
                     response = (args == null) ? "No argument specified" : GetCurrent(args[0]).Result;

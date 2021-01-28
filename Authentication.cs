@@ -7,16 +7,6 @@ namespace TCP_Server_Asynchronous
 {
     public class Authentication
     {
-        private void CreateUserHistory(string login)
-        {
-            string data;
-
-            using (var sr = new StreamReader("user-history.json"))
-            {
-                data = sr.ReadToEnd();
-            }
-        }
-
         /// <summary>
         /// Creates new user.
         /// </summary>
