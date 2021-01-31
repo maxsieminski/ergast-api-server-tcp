@@ -98,7 +98,6 @@ namespace TCP_Server_Asynchronous
                 if ((string)row["login"] == login)
                 {
                     Console.WriteLine(row["password"].ToString().Length);
-                    Console.WriteLine(password.Length);
                     userfound = true;
                     if ((string)row["password"] == password)
                     {

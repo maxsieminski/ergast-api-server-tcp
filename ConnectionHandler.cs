@@ -225,7 +225,9 @@ namespace TCP_Server_Asynchronous
                     response = (args == null) ? "User error!" : Authentication.DeleteUser(args[0], user);
                     break;
                 case "help":
-                    response = "Komenda Rok Runda";
+                    response = "Dostepne komendy:\n1. standings [rok] [runda]\n2.constandings [rok] [runda]" +
+                                "\n3.driver [nazwisko]\n4.schedule [rok]\n5.Current [nazwisko]\n6. stats [druzyna]" +
+                                "\n7. history";
                     break;    
             }
 

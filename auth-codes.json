@@ -14,6 +14,11 @@
       "login": "wielas",
       "password": "wielas123",
       "is_admin": "False"
+    },
+    {
+      "login":"user",
+      "password":"password123",
+      "is_admin":"False"
     }
   ]
 }
